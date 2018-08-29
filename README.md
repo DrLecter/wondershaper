@@ -50,27 +50,34 @@ If you get messages telling you that ```RTNETLINK answers: Operation not permitt
     
 ### System installation (optional)
 
-A makefile file provided for easy installation. The default location for wondershaper is in ```/usr/bin```. If you want to install to your system you can run:
+A makefile file provided for easy installation. This version of wondershaper installs the actual wondershaping script in /sbin (the Debian way). An additional wrapping script -also called wondershaper- is put in ```/usr/bin```. This wrapper parses .conf files when "start" or "stop" parameters are provided, behaving as the original script otherwise. If you want to install to your system you can run:
 
     sudo make install
         
-You can verify that wondershaper was installed correctly by entering:
+You can verify that wondershaper was installed correctly by entering (as root):
 
-    which wondershaper
+    for i in ${PATH//:/ };do find "$i/wondershaper" 2> /dev/null; done
     
-This should return ```/usr/bin/wondershaper```. You can follow the same instructions as explained in the "Using wondershaper" section, but instead of running the local version of the program you now run the system version by removing the ```./``` from the beginning of each command. For example to show the help instructions again run:
+This should return 
+
+```/sbin/wondershaper```
+```/usr/bin/wondershaper```
+
+You can follow the same instructions as explained in the "Using wondershaper" section, but instead of running the local version of the program you now run the system version by removing the ```./``` from the beginning of each command. For example to show the help instructions again run:
 
     wondershaper -h
 
 ### Persistent usage of wondershaper (optional)
 
-To make sure wondershaper is reactivated on reboot a systemd service file is provided. First enable wondershapre as a systemd service using:
+To make sure wondershaper is reactivated on reboot a systemd service file is provided. First enable wondershaper as a systemd service using:
 
     sudo systemctl enable wondershaper.service 
  
-Instead of using the commandline options to set the rates and interface as previously shown, it is necessary to set these parameters in the ```wondershaper.conf``` configuration file. You can edit this file using your favourite text editor (nano in the example below) as such:
+Instead of using the commandline options to set the rates and interface/s as previously shown, it is necessary to set these parameters in a ```.conf``` configuration file within ```/etc/conf.d/wondershaper```. You can edit these files using your favourite text editor (nano in the example below) as such:
 
-    sudo nano /etc/conf.d/wondershaper.conf
+    sudo nano /etc/conf.d/wondershaper/eth0.conf
+
+One file must be created for every network adapter you need to shape, so set IFACE, DSPEED and USPEED values accordingly. File names aren't considered in any particular manner by the service startup script (```/usb/bin/wondershaper```) which just parses every .conf file found. It's up to you to choose a descriptive name.
     
 This way wondershaper is activated with your setting upon reboot.
 
@@ -102,6 +109,8 @@ The different modes are:
         wondershaper -c -a <adapter>
 
         wondershaper -s -a <adapter>
+        
+        wondershaper <start|stop>
 
 Some examples:
 
@@ -112,3 +121,6 @@ Some examples:
         wondershaper -a eth1 -u 94000  # only limit upload
 
         wondershaper -c -a eth0
+        
+        wondershaper start
+        
