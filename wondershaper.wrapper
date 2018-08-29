@@ -1,0 +1,31 @@
+#!/bin/bash
+
+do_start()
+{
+for i in /etc/conf.d/wondershaper/*.conf;do
+	source $i
+	/sbin/wondershaper -a $IFACE -d $DSPEED -u $USPEED
+done
+}
+
+do_stop()
+{
+for i in /etc/conf.d/wondershaper/*.conf;do
+	source $i
+	/sbin/wondershaper -c -a $IFACE
+done
+}
+
+
+case "$1" in
+	start)
+		do_start
+		exit 0;;
+	stop)
+		do_stop
+		exit 0;;
+	*)
+		/sbin/wondershaper $@
+		exit 0;;
+esac
+
